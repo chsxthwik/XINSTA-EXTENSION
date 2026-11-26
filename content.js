@@ -6,21 +6,28 @@
 
   // --- controls ---
   const ui = document.createElement('div'); ui.id = 'xi-ui';
-  ui.innerHTML = '<button class="xi-toggle" title="Toggle Reels mode (R)" aria-pressed="false"></button>' +
-    '<button class="xi-nav" data-d="-1" title="Previous (↑ or K)" aria-label="Previous post"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
-    '<button class="xi-nav" data-d="1" title="Next (↓, Space or J)" aria-label="Next post"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
-    '<span id="xi-hint">J/K to move, L like, M mute, O open, R exit</span>';
+  ui.setAttribute('role', 'toolbar'); ui.setAttribute('aria-label', 'XINSTA');
+  ui.innerHTML = '<button class="xi-toggle" title="Reels mode (R)" aria-pressed="false"><svg class="xi-logo" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8.5v7l6-3.5z" fill="currentColor"/></svg><span class="xi-label"></span></button>' +
+    '<span class="xi-group">' +
+    '<button class="xi-nav" data-d="-1" title="Previous (K or ↑)" aria-label="Previous post"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<button class="xi-nav" data-d="1" title="Next (J, ↓ or Space)" aria-label="Next post"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+    '<button class="xi-keys-btn" title="Shortcuts" aria-label="Shortcuts" aria-expanded="false">?</button>' +
+    '</span>' +
+    '<div class="xi-keys" hidden><b>XINSTA</b><span><kbd>J</kbd><kbd>↓</kbd><kbd>Space</kbd> next</span><span><kbd>K</kbd><kbd>↑</kbd> previous</span><span><kbd>L</kbd> like</span><span><kbd>M</kbd> mute</span><span><kbd>O</kbd> open post</span><span><kbd>R</kbd> Reels on or off</span><i>by QUANTUM</i></div>';
   const toggle = ui.querySelector('.xi-toggle');
   const on = () => root.classList.contains('xi-on');
   const set = (v) => {
     root.classList.toggle('xi-on', v); store.set(v);
-    toggle.textContent = v ? 'Exit Reels' : 'Reels';
+    toggle.querySelector('.xi-label').textContent = v ? 'Exit' : 'XINSTA';
     toggle.classList.toggle('on', v); toggle.setAttribute('aria-pressed', String(v));
     if (v) { mark(); setTimeout(() => snapTo(current() ?? 0), 60); }
   };
   toggle.onclick = () => set(!on());
+  const keysBtn = ui.querySelector('.xi-keys-btn'), keys = ui.querySelector('.xi-keys');
+  keysBtn.onclick = () => { keys.hidden = !keys.hidden; keysBtn.setAttribute('aria-expanded', String(!keys.hidden)); };
   ui.querySelectorAll('.xi-nav').forEach(b => b.onclick = () => go(+b.dataset.d));
-  const mount = () => { if (!document.body.contains(ui)) document.body.appendChild(ui); };
+  const mount = () => { document.querySelectorAll('#xi-ui').forEach(n => { if (n !== ui) n.remove(); }); if (!document.body.contains(ui)) document.body.appendChild(ui); };
+  try { chrome.runtime.onMessage.addListener((m) => { if (m && m.type === 'xi-toggle') set(!on()); }); } catch {}
 
   // --- mark post cells (no :has dependency) ---
   const mark = () => {

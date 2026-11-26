@@ -29,12 +29,17 @@ Scroll X (x.com) like Instagram Reels: one post per screen, centred, with snap s
 | `L` | Like or unlike the post in view |
 | `M` | Mute or unmute the video in view |
 | `O` | Open the post in view |
+| `?` button | Show every shortcut |
 | `R` | Turn Reels mode on or off |
 
 ## How it works
 
 A content script marks each timeline cell that holds a post, and CSS makes those cells full height with scroll snapping. X still renders and loads the timeline itself, so the extension keeps working as you scroll.
 
+## Toolbar
+
+Click the XINSTA icon in the toolbar to turn Reels mode on or off on the current X tab.
+
 ## License
 
-MIT
+MIT, by QUANTUM.
